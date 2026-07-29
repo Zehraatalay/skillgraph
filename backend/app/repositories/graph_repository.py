@@ -221,6 +221,257 @@ class GraphRepository:
                 "developer_login": developer_login,
             },
         )
+    def get_developer_graph(
+        self,
+        developer_login: str,
+    ) -> dict[str, Any] | None:
+        result = self._neo4j.run_query(
+            """
+            MATCH (developer:Developer)
+            WHERE toLower(developer.login) =
+                  toLower($developer_login)
+
+            OPTIONAL MATCH
+                (developer)-[owns:OWNS]->
+                (repository:Repository)
+
+            OPTIONAL MATCH
+                (repository)-[uses:USES]->
+                (technology:Technology)
+
+            OPTIONAL MATCH
+                (repository)-[has_topic:HAS_TOPIC]->
+                (topic:Topic)
+
+            RETURN
+                developer {
+                    .login,
+                    .name,
+                    .avatar_url,
+                    .html_url
+                } AS developer,
+
+                collect(
+                    DISTINCT CASE
+                        WHEN repository IS NULL
+                        THEN NULL
+                        ELSE repository {
+                            .github_id,
+                            .name,
+                            .full_name,
+                            .html_url,
+                            .description,
+                            .primary_language,
+                            .stars,
+                            .forks,
+                            .archived
+                        }
+                    END
+                ) AS repositories,
+
+                collect(
+                    DISTINCT CASE
+                        WHEN technology IS NULL
+                        THEN NULL
+                        ELSE technology {
+                            .name
+                        }
+                    END
+                ) AS technologies,
+
+                collect(
+                    DISTINCT CASE
+                        WHEN topic IS NULL
+                        THEN NULL
+                        ELSE topic {
+                            .name
+                        }
+                    END
+                ) AS topics,
+
+                collect(
+                    DISTINCT CASE
+                        WHEN repository IS NULL
+                             OR technology IS NULL
+                             OR uses IS NULL
+                        THEN NULL
+                        ELSE {
+                            repository_id: repository.github_id,
+                            technology_name: technology.name,
+                            byte_count: uses.byte_count
+                        }
+                    END
+                ) AS technology_edges,
+
+                collect(
+                    DISTINCT CASE
+                        WHEN repository IS NULL
+                             OR topic IS NULL
+                             OR has_topic IS NULL
+                        THEN NULL
+                        ELSE {
+                            repository_id: repository.github_id,
+                            topic_name: topic.name
+                        }
+                    END
+                ) AS topic_edges
+            """,
+            {
+                "developer_login": developer_login,
+            },
+        )
+
+        if not result:
+            return None
+
+        row = result[0]
+
+        developer = row["developer"]
+
+        repositories = [
+            item
+            for item in row["repositories"]
+            if item is not None
+        ]
+
+        technologies = [
+            item
+            for item in row["technologies"]
+            if item is not None
+        ]
+
+        topics = [
+            item
+            for item in row["topics"]
+            if item is not None
+        ]
+
+        technology_edges = [
+            item
+            for item in row["technology_edges"]
+            if item is not None
+        ]
+
+        topic_edges = [
+            item
+            for item in row["topic_edges"]
+            if item is not None
+        ]
+
+        developer_id = f"developer:{developer['login']}"
+
+        nodes: list[dict[str, Any]] = [
+            {
+                "id": developer_id,
+                "label": (
+                    developer.get("name")
+                    or developer["login"]
+                ),
+                "type": "Developer",
+                "properties": developer,
+            }
+        ]
+
+        edges: list[dict[str, Any]] = []
+
+        for repository in repositories:
+            repository_id = (
+                f"repository:{repository['github_id']}"
+            )
+
+            nodes.append(
+                {
+                    "id": repository_id,
+                    "label": repository["name"],
+                    "type": "Repository",
+                    "properties": repository,
+                }
+            )
+
+            edges.append(
+                {
+                    "id": (
+                        f"owns:{developer['login']}:"
+                        f"{repository['github_id']}"
+                    ),
+                    "source": developer_id,
+                    "target": repository_id,
+                    "type": "OWNS",
+                    "properties": {},
+                }
+            )
+
+        for technology in technologies:
+            technology_id = (
+                f"technology:{technology['name']}"
+            )
+
+            nodes.append(
+                {
+                    "id": technology_id,
+                    "label": technology["name"],
+                    "type": "Technology",
+                    "properties": technology,
+                }
+            )
+
+        for topic in topics:
+            topic_id = f"topic:{topic['name']}"
+
+            nodes.append(
+                {
+                    "id": topic_id,
+                    "label": topic["name"],
+                    "type": "Topic",
+                    "properties": topic,
+                }
+            )
+
+        for edge in technology_edges:
+            edges.append(
+                {
+                    "id": (
+                        f"uses:{edge['repository_id']}:"
+                        f"{edge['technology_name']}"
+                    ),
+                    "source": (
+                        f"repository:{edge['repository_id']}"
+                    ),
+                    "target": (
+                        f"technology:{edge['technology_name']}"
+                    ),
+                    "type": "USES",
+                    "properties": {
+                        "byte_count": (
+                            edge.get("byte_count") or 0
+                        )
+                    },
+                }
+            )
+
+        for edge in topic_edges:
+            edges.append(
+                {
+                    "id": (
+                        f"topic:{edge['repository_id']}:"
+                        f"{edge['topic_name']}"
+                    ),
+                    "source": (
+                        f"repository:{edge['repository_id']}"
+                    ),
+                    "target": f"topic:{edge['topic_name']}",
+                    "type": "HAS_TOPIC",
+                    "properties": {},
+                }
+            )
+
+        return {
+            "developer_login": developer["login"],
+            "node_count": len(nodes),
+            "edge_count": len(edges),
+            "nodes": nodes,
+            "edges": edges,
+        }
     
     def close(self) -> None:
         self._neo4j.close()

@@ -6,12 +6,15 @@ import SkillCard from '@/components/SkillCard.vue'
 import {
   analyzeDeveloper,
   checkBackendHealth,
+  getDeveloperGraph,
   getDeveloperRecommendations,
   getDeveloperSkills,
   getGitHubPreview,
 } from '@/services/api'
 
 import RecommendationCard from '@/components/RecommendationCard.vue'
+
+import DeveloperGraph from '@/components/DeveloperGraph.vue'
 
 const username = ref('')
 const loading = ref(false)
@@ -31,6 +34,8 @@ const topSkill = computed(() => {
 })
 
 const recommendations = ref([])
+
+const developerGraph = ref(null)
 
 async function checkHealth() {
   try {
@@ -55,16 +60,18 @@ async function handleAnalyze() {
   try {
     await analyzeDeveloper(normalizedUsername)
 
-    const [previewResult, skillResult, recommendationResult] = await Promise.all([
+    const [previewResult, skillResult, recommendationResult, graphResult] = await Promise.all([
       getGitHubPreview(normalizedUsername),
       getDeveloperSkills(normalizedUsername),
       getDeveloperRecommendations(normalizedUsername),
+      getDeveloperGraph(normalizedUsername),
     ])
 
     profile.value = previewResult.user
     repositories.value = previewResult.repositories
     skillProfile.value = skillResult
     recommendations.value = recommendationResult.recommendations
+    developerGraph.value = graphResult
   } catch (error) {
     errorMessage.value =
       error instanceof Error ? error.message : 'Analiz sırasında bilinmeyen bir hata oluştu.'
@@ -80,6 +87,7 @@ function clearResults() {
   repositories.value = []
   skillProfile.value = null
   recommendations.value = []
+  developerGraph.value = null
 }
 
 onMounted(checkHealth)
@@ -198,6 +206,22 @@ onMounted(checkHealth)
               <strong>{{ topSkill?.score ?? '—' }}</strong>
             </article>
           </div>
+        </section>
+
+        <section v-if="developerGraph" class="content-section">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Neo4j visualization</p>
+              <h2>Geliştirici bilgi graph’ı</h2>
+            </div>
+
+            <p>
+              Node’ları sürükleyebilir, yakınlaştırabilir ve ayrıntıları görüntülemek için graph
+              öğelerine tıklayabilirsin.
+            </p>
+          </div>
+
+          <DeveloperGraph :graph="developerGraph" />
         </section>
 
         <section class="content-section">

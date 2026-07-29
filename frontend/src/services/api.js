@@ -64,3 +64,7 @@ export function checkBackendHealth() {
 export function getDeveloperRecommendations(username) {
   return request(`/recommendations/developers/${encodeURIComponent(username)}`)
 }
+
+export function getDeveloperGraph(username) {
+  return request(`/graphs/developers/${encodeURIComponent(username)}`)
+}
