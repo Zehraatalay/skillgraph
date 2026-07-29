@@ -13,6 +13,10 @@ class Settings(BaseSettings):
     neo4j_password: str
     neo4j_database: str = "neo4j"
 
+    github_api_url: str = "https://api.github.com"
+    github_token: str
+    github_api_version: str = "2026-03-10"
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

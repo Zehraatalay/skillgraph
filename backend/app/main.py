@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api.routes.github import router as github_router
 from app.api.routes.health import router as health_router
 from app.core.config import get_settings
 
@@ -24,11 +25,4 @@ app.add_middleware(
 )
 
 app.include_router(health_router, prefix="/api")
-
-
-@app.get("/")
-async def root() -> dict[str, str]:
-    return {
-        "message": f"{settings.app_name} is running",
-        "version": settings.app_version,
-    }
+app.include_router(github_router, prefix="/api")
