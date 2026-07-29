@@ -7,6 +7,8 @@ from app.core.config import get_settings
 
 from app.api.routes.analysis import router as analysis_router
 
+from app.api.routes.skill import router as skill_router
+
 settings = get_settings()
 
 app = FastAPI(
@@ -29,3 +31,4 @@ app.add_middleware(
 app.include_router(health_router, prefix="/api")
 app.include_router(github_router, prefix="/api")
 app.include_router(analysis_router, prefix="/api")
+app.include_router(skill_router, prefix="/api")

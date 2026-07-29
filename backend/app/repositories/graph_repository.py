@@ -194,6 +194,33 @@ class GraphRepository:
             return None
 
         return result[0]["summary"]
+
+    def get_developer_technology_statistics(
+        self,
+        developer_login: str,
+    ) -> list[dict[str, Any]]:
+        return self._neo4j.run_query(
+            """
+            MATCH (developer:Developer)-[:OWNS]->
+                  (repository:Repository)-[uses:USES]->
+                  (technology:Technology)
+
+            WHERE toLower(developer.login) =
+                  toLower($developer_login)
+
+            RETURN
+                technology.name AS technology,
+                count(DISTINCT repository) AS repository_count,
+                sum(coalesce(uses.byte_count, 0)) AS total_bytes,
+                sum(coalesce(repository.stars, 0)) AS total_stars,
+                collect(DISTINCT repository.name) AS repositories
+
+            ORDER BY total_bytes DESC
+            """,
+            {
+                "developer_login": developer_login,
+            },
+        )
     
     def close(self) -> None:
         self._neo4j.close()
