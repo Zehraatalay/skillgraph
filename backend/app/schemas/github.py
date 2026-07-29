@@ -1,5 +1,4 @@
-from pydantic import BaseModel, ConfigDict
-
+from pydantic import BaseModel, ConfigDict, Field
 
 class GitHubRepositoryResponse(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -12,7 +11,7 @@ class GitHubRepositoryResponse(BaseModel):
     language: str | None = None
     stargazers_count: int
     forks_count: int
-    topics: list[str] = []
+    topics: list[str] = Field(default_factory=list)
     fork: bool
     archived: bool
 

@@ -104,5 +104,19 @@ class GitHubRepository:
 
         return repositories
 
+    def get_repository_languages(
+        self,
+        owner: str,
+        repository_name: str,
+    ) -> dict[str, int]:
+        result = self._get(
+            f"/repos/{owner}/{repository_name}/languages"
+        )
+
+        return {
+            language: int(byte_count)
+            for language, byte_count in result.items()
+        }
+
     def close(self) -> None:
         self._session.close()
