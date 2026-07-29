@@ -6,9 +6,12 @@ import SkillCard from '@/components/SkillCard.vue'
 import {
   analyzeDeveloper,
   checkBackendHealth,
+  getDeveloperRecommendations,
   getDeveloperSkills,
   getGitHubPreview,
 } from '@/services/api'
+
+import RecommendationCard from '@/components/RecommendationCard.vue'
 
 const username = ref('')
 const loading = ref(false)
@@ -26,6 +29,8 @@ const hasResults = computed(() => {
 const topSkill = computed(() => {
   return skillProfile.value?.skills?.[0] ?? null
 })
+
+const recommendations = ref([])
 
 async function checkHealth() {
   try {
@@ -50,14 +55,16 @@ async function handleAnalyze() {
   try {
     await analyzeDeveloper(normalizedUsername)
 
-    const [previewResult, skillResult] = await Promise.all([
+    const [previewResult, skillResult, recommendationResult] = await Promise.all([
       getGitHubPreview(normalizedUsername),
       getDeveloperSkills(normalizedUsername),
+      getDeveloperRecommendations(normalizedUsername),
     ])
 
     profile.value = previewResult.user
     repositories.value = previewResult.repositories
     skillProfile.value = skillResult
+    recommendations.value = recommendationResult.recommendations
   } catch (error) {
     errorMessage.value =
       error instanceof Error ? error.message : 'Analiz sırasında bilinmeyen bir hata oluştu.'
@@ -72,6 +79,7 @@ function clearResults() {
   profile.value = null
   repositories.value = []
   skillProfile.value = null
+  recommendations.value = []
 }
 
 onMounted(checkHealth)
@@ -210,6 +218,28 @@ onMounted(checkHealth)
               v-for="skill in skillProfile.skills"
               :key="skill.technology"
               :skill="skill"
+            />
+          </div>
+        </section>
+
+        <section v-if="recommendations.length" class="content-section">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Recommendation engine</p>
+              <h2>Sonraki öğrenme adımları</h2>
+            </div>
+
+            <p>
+              Öneriler mevcut teknoloji skorları ve tamamlayıcı yetkinlik ilişkileri üzerinden
+              hesaplanır.
+            </p>
+          </div>
+
+          <div class="recommendations-grid">
+            <RecommendationCard
+              v-for="recommendation in recommendations"
+              :key="recommendation.technology"
+              :recommendation="recommendation"
             />
           </div>
         </section>
@@ -539,6 +569,7 @@ onMounted(checkHealth)
 }
 
 .skills-grid,
+.recommendations-grid,
 .repositories-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -587,6 +618,7 @@ footer {
 
   .summary-grid,
   .skills-grid,
+  .recommendations-grid,
   .repositories-grid {
     grid-template-columns: 1fr;
   }

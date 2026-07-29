@@ -9,6 +9,10 @@ from app.api.routes.analysis import router as analysis_router
 
 from app.api.routes.skill import router as skill_router
 
+from app.api.routes.recommendation import (
+    router as recommendation_router,
+)
+
 settings = get_settings()
 
 app = FastAPI(
@@ -32,3 +36,4 @@ app.include_router(health_router, prefix="/api")
 app.include_router(github_router, prefix="/api")
 app.include_router(analysis_router, prefix="/api")
 app.include_router(skill_router, prefix="/api")
+app.include_router(recommendation_router, prefix="/api")

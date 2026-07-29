@@ -60,3 +60,7 @@ export function getGitHubPreview(username) {
 export function checkBackendHealth() {
   return request('/health')
 }
+
+export function getDeveloperRecommendations(username) {
+  return request(`/recommendations/developers/${encodeURIComponent(username)}`)
+}
