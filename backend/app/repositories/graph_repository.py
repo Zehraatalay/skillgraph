@@ -575,5 +575,48 @@ class GraphRepository:
         )
 
         return bool(rows)
+
+
+    def get_developer_technology_vectors(
+        self,
+    ) -> list[dict[str, Any]]:
+        return self._neo4j.run_query(
+            """
+            MATCH (developer:Developer)-[:OWNS]->
+                (repository:Repository)-[uses:USES]->
+                (technology:Technology)
+
+            WITH
+                developer,
+                technology.name AS technology,
+                sum(
+                    CASE
+                        WHEN uses.byte_count IS NULL
+                        THEN 1
+                        WHEN uses.byte_count <= 0
+                        THEN 1
+                        ELSE uses.byte_count
+                    END
+                ) AS technology_weight
+
+            WITH
+                developer,
+                collect(
+                    {
+                        technology: technology,
+                        weight: toFloat(technology_weight)
+                    }
+                ) AS technology_vector
+
+            RETURN
+                developer.login AS login,
+                developer.name AS name,
+                developer.avatar_url AS avatar_url,
+                developer.html_url AS html_url,
+                technology_vector
+
+            ORDER BY developer.login
+            """
+        )
     def close(self) -> None:
         self._neo4j.close()
