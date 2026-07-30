@@ -68,3 +68,11 @@ export function getDeveloperRecommendations(username) {
 export function getDeveloperGraph(username) {
   return request(`/graphs/developers/${encodeURIComponent(username)}`)
 }
+
+export function getSimilarDevelopers(username, limit = 5) {
+  const query = new URLSearchParams({
+    limit: String(limit),
+  })
+
+  return request(`/similarity/developers/${encodeURIComponent(username)}?${query}`)
+}

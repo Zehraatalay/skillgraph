@@ -10,11 +10,14 @@ import {
   getDeveloperRecommendations,
   getDeveloperSkills,
   getGitHubPreview,
+  getSimilarDevelopers,
 } from '@/services/api'
 
 import RecommendationCard from '@/components/RecommendationCard.vue'
 
 import DeveloperGraph from '@/components/DeveloperGraph.vue'
+
+import SimilarDeveloperCard from '@/components/SimilarDeveloperCard.vue'
 
 const username = ref('')
 const loading = ref(false)
@@ -36,6 +39,8 @@ const topSkill = computed(() => {
 const recommendations = ref([])
 
 const developerGraph = ref(null)
+
+const similarDevelopers = ref([])
 
 async function checkHealth() {
   try {
@@ -60,18 +65,21 @@ async function handleAnalyze() {
   try {
     await analyzeDeveloper(normalizedUsername)
 
-    const [previewResult, skillResult, recommendationResult, graphResult] = await Promise.all([
-      getGitHubPreview(normalizedUsername),
-      getDeveloperSkills(normalizedUsername),
-      getDeveloperRecommendations(normalizedUsername),
-      getDeveloperGraph(normalizedUsername),
-    ])
+    const [previewResult, skillResult, recommendationResult, graphResult, similarityResult] =
+      await Promise.all([
+        getGitHubPreview(normalizedUsername),
+        getDeveloperSkills(normalizedUsername),
+        getDeveloperRecommendations(normalizedUsername),
+        getDeveloperGraph(normalizedUsername),
+        getSimilarDevelopers(normalizedUsername),
+      ])
 
     profile.value = previewResult.user
     repositories.value = previewResult.repositories
     skillProfile.value = skillResult
     recommendations.value = recommendationResult.recommendations
     developerGraph.value = graphResult
+    similarDevelopers.value = similarityResult.similar_developers
   } catch (error) {
     errorMessage.value =
       error instanceof Error ? error.message : 'Analiz sırasında bilinmeyen bir hata oluştu.'
@@ -88,6 +96,7 @@ function clearResults() {
   skillProfile.value = null
   recommendations.value = []
   developerGraph.value = null
+  similarDevelopers.value = []
 }
 
 onMounted(checkHealth)
@@ -265,6 +274,36 @@ onMounted(checkHealth)
               :key="recommendation.technology"
               :recommendation="recommendation"
             />
+          </div>
+        </section>
+        <section class="content-section">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Graph similarity</p>
+              <h2>Benzer geliştiriciler</h2>
+            </div>
+
+            <p>
+              Benzerlik, Neo4j graph’ındaki ortak ve toplam teknolojiler üzerinden hesaplanan
+              Jaccard skorudur.
+            </p>
+          </div>
+
+          <div v-if="similarDevelopers.length" class="similar-developers-grid">
+            <SimilarDeveloperCard
+              v-for="developer in similarDevelopers"
+              :key="developer.login"
+              :developer="developer"
+            />
+          </div>
+
+          <div v-else class="empty-similarity">
+            <h3>Henüz benzer geliştirici bulunamadı</h3>
+
+            <p>
+              Karşılaştırma yapılabilmesi için başka GitHub kullanıcılarının da SkillGraph üzerinde
+              analiz edilmiş olması gerekir.
+            </p>
           </div>
         </section>
 
@@ -594,10 +633,31 @@ onMounted(checkHealth)
 
 .skills-grid,
 .recommendations-grid,
+.similar-developers-grid,
 .repositories-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 17px;
+}
+.empty-similarity {
+  padding: 35px;
+  border: 1px dashed var(--border);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.55);
+  text-align: center;
+}
+
+.empty-similarity h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.empty-similarity p {
+  max-width: 580px;
+  margin: 10px auto 0;
+  color: var(--text-muted);
+  font-size: 0.86rem;
+  line-height: 1.6;
 }
 
 .repositories-section {
@@ -643,6 +703,7 @@ footer {
   .summary-grid,
   .skills-grid,
   .recommendations-grid,
+  .similar-developers-grid,
   .repositories-grid {
     grid-template-columns: 1fr;
   }

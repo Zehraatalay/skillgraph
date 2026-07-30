@@ -472,6 +472,108 @@ class GraphRepository:
             "nodes": nodes,
             "edges": edges,
         }
-    
+
+    def get_similar_developers(
+        self,
+        developer_login: str,
+        limit: int = 5,
+    ) -> list[dict[str, Any]]:
+        return self._neo4j.run_query(
+            """
+            MATCH (target:Developer)-[:OWNS]->
+                  (:Repository)-[:USES]->
+                  (target_technology:Technology)
+
+            WHERE toLower(target.login) =
+                  toLower($developer_login)
+
+            WITH
+                target,
+                collect(
+                    DISTINCT target_technology.name
+                ) AS target_technologies
+
+            MATCH (candidate:Developer)-[:OWNS]->
+                  (:Repository)-[:USES]->
+                  (candidate_technology:Technology)
+
+            WHERE candidate <> target
+
+            WITH
+                target_technologies,
+                candidate,
+                collect(
+                    DISTINCT candidate_technology.name
+                ) AS candidate_technologies
+
+            WITH
+                candidate,
+                target_technologies,
+                candidate_technologies,
+                [
+                    technology IN candidate_technologies
+                    WHERE technology IN target_technologies
+                ] AS shared_technologies
+
+            WITH
+                candidate,
+                candidate_technologies,
+                shared_technologies,
+                (
+                    size(target_technologies)
+                    + size(candidate_technologies)
+                    - size(shared_technologies)
+                ) AS union_count
+
+            WHERE size(shared_technologies) > 0
+                  AND union_count > 0
+
+            RETURN
+                candidate.login AS login,
+                candidate.name AS name,
+                candidate.avatar_url AS avatar_url,
+                candidate.html_url AS html_url,
+                shared_technologies,
+                candidate_technologies,
+                size(
+                    shared_technologies
+                ) AS shared_technology_count,
+                (
+                    100.0
+                    * size(shared_technologies)
+                    / union_count
+                ) AS similarity_score
+
+            ORDER BY
+                similarity_score DESC,
+                shared_technology_count DESC,
+                login ASC
+
+            LIMIT $limit
+            """,
+            {
+                "developer_login": developer_login,
+                "limit": limit,
+            },
+        )
+    def developer_exists(
+        self,
+        developer_login: str,
+    ) -> bool:
+        rows = self._neo4j.run_query(
+            """
+            MATCH (developer:Developer)
+            WHERE toLower(developer.login) =
+                toLower($developer_login)
+
+            RETURN developer.login AS login
+            LIMIT 1
+            """,
+            {
+                "developer_login": developer_login,
+            },
+        )
+
+        return bool(rows)
     def close(self) -> None:
         self._neo4j.close()
