@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes.github import router as github_router
+
 from app.api.routes.health import router as health_router
 from app.core.config import get_settings
 
@@ -19,6 +19,12 @@ from app.api.routes.similarity import (
     router as similarity_router,
 )
 
+from app.github.router import router as github_router
+
+from app.matching.router import (
+    router as matching_router,
+)
+
 settings = get_settings()
 
 app = FastAPI(
@@ -27,6 +33,7 @@ app = FastAPI(
     version=settings.app_version,
     debug=settings.debug,
 )
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -45,3 +52,7 @@ app.include_router(skill_router, prefix="/api")
 app.include_router(recommendation_router, prefix="/api")
 app.include_router(graph_router, prefix="/api")
 app.include_router(similarity_router, prefix="/api")
+app.include_router(
+    matching_router,
+    prefix="/api",
+)

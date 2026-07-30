@@ -19,6 +19,8 @@ import DeveloperGraph from '@/components/DeveloperGraph.vue'
 
 import SimilarDeveloperCard from '@/components/SimilarDeveloperCard.vue'
 
+import { RouterLink } from "vue-router";
+
 const username = ref('')
 const loading = ref(false)
 const errorMessage = ref('')
@@ -110,9 +112,21 @@ onMounted(checkHealth)
         <span>SkillGraph</span>
       </a>
 
-      <div class="backend-status" :class="{ online: backendOnline }">
-        <span class="status-dot"></span>
-        {{ backendOnline ? 'API online' : 'API offline' }}
+      <div class="nav-actions">
+        <RouterLink
+          class="repository-link-button"
+          to="/repository-matching"
+        >
+          Repository Matching
+        </RouterLink>
+
+        <div
+          class="backend-status"
+          :class="{ online: backendOnline }"
+        >
+          <span class="status-dot"></span>
+          {{ backendOnline ? "API online" : "API offline" }}
+        </div>
       </div>
     </header>
 
@@ -336,7 +350,25 @@ onMounted(checkHealth)
 .home-page {
   min-height: 100vh;
 }
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
 
+.repository-link-button {
+  padding: 10px 18px;
+  border-radius: 10px;
+  background: #172033;
+  color: white;
+  text-decoration: none;
+  font-weight: 700;
+  transition: 0.2s;
+}
+
+.repository-link-button:hover {
+  background: #176a50;
+}
 .navbar {
   display: flex;
   width: min(1180px, calc(100% - 40px));

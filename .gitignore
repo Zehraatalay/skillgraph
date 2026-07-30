@@ -33,5 +33,3 @@ frontend/.vite/
 *.log
 npm-debug.log*
 
-#Dataset
-backend/data/jobs/

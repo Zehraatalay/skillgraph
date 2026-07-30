@@ -1,0 +1,401 @@
+from __future__ import annotations
+
+from typing import Final
+
+
+ROLE_SKILL_PROFILES: Final[
+    dict[str, dict[str, tuple[str, ...]]]
+] = {
+    "backend": {
+        "core": (
+            "git",
+            "rest api",
+            "sql",
+            "unit testing",
+        ),
+        "languages": (
+            "python",
+            "java",
+            "c#",
+            "javascript",
+            "typescript",
+            "go",
+        ),
+        "frameworks": (
+            "fastapi",
+            "django",
+            "flask",
+            "spring boot",
+            "asp.net core",
+            "node.js",
+            "express.js",
+        ),
+        "databases": (
+            "postgresql",
+            "mysql",
+            "mongodb",
+            "redis",
+            "neo4j",
+        ),
+        "tools": (
+            "docker",
+            "github actions",
+            "pytest",
+            "swagger",
+            "linux",
+            "aws",
+            "rabbitmq",
+            "celery",
+        ),
+    },
+    "frontend": {
+        "core": (
+            "html",
+            "css",
+            "javascript",
+            "git",
+            "responsive design",
+        ),
+        "languages": (
+            "javascript",
+            "typescript",
+        ),
+        "frameworks": (
+            "react",
+            "vue.js",
+            "angular",
+            "next.js",
+            "nuxt.js",
+        ),
+        "tools": (
+            "vite",
+            "webpack",
+            "jest",
+            "vitest",
+            "cypress",
+            "playwright",
+            "tailwind css",
+            "sass",
+            "figma",
+        ),
+    },
+    "full_stack": {
+        "core": (
+            "git",
+            "rest api",
+            "sql",
+            "html",
+            "css",
+            "javascript",
+        ),
+        "frontend": (
+            "react",
+            "vue.js",
+            "angular",
+            "typescript",
+            "next.js",
+        ),
+        "backend": (
+            "python",
+            "fastapi",
+            "django",
+            "node.js",
+            "express.js",
+            "java",
+            "spring boot",
+        ),
+        "databases": (
+            "postgresql",
+            "mysql",
+            "mongodb",
+            "redis",
+        ),
+        "tools": (
+            "docker",
+            "github actions",
+            "jest",
+            "pytest",
+            "aws",
+        ),
+    },
+    "machine_learning": {
+        "core": (
+            "python",
+            "git",
+            "machine learning",
+            "data preprocessing",
+            "model evaluation",
+        ),
+        "libraries": (
+            "pytorch",
+            "tensorflow",
+            "scikit-learn",
+            "pandas",
+            "numpy",
+            "opencv",
+            "transformers",
+        ),
+        "specializations": (
+            "computer vision",
+            "natural language processing",
+            "deep learning",
+            "time series",
+            "recommendation systems",
+        ),
+        "tools": (
+            "jupyter",
+            "mlflow",
+            "docker",
+            "fastapi",
+            "sql",
+            "wandb",
+        ),
+    },
+    "ai_engineering": {
+        "core": (
+            "python",
+            "git",
+            "rest api",
+            "machine learning",
+            "prompt engineering",
+        ),
+        "frameworks": (
+            "langchain",
+            "llamaindex",
+            "transformers",
+            "pytorch",
+            "fastapi",
+        ),
+        "technologies": (
+            "large language models",
+            "retrieval augmented generation",
+            "vector databases",
+            "embedding models",
+            "semantic search",
+            "agentic ai",
+        ),
+        "tools": (
+            "docker",
+            "postgresql",
+            "redis",
+            "neo4j",
+            "chromadb",
+            "pinecone",
+            "github actions",
+        ),
+    },
+    "data_engineering": {
+        "core": (
+            "python",
+            "sql",
+            "git",
+            "etl",
+            "data modeling",
+        ),
+        "platforms": (
+            "apache spark",
+            "apache kafka",
+            "airflow",
+            "dbt",
+            "hadoop",
+        ),
+        "databases": (
+            "postgresql",
+            "mysql",
+            "mongodb",
+            "snowflake",
+            "bigquery",
+            "redshift",
+        ),
+        "cloud": (
+            "aws",
+            "azure",
+            "google cloud",
+        ),
+        "tools": (
+            "docker",
+            "linux",
+            "github actions",
+            "pandas",
+        ),
+    },
+    "data_science": {
+        "core": (
+            "python",
+            "sql",
+            "statistics",
+            "data analysis",
+            "data visualization",
+        ),
+        "libraries": (
+            "pandas",
+            "numpy",
+            "scikit-learn",
+            "matplotlib",
+            "seaborn",
+            "jupyter",
+        ),
+        "analytics": (
+            "a/b testing",
+            "hypothesis testing",
+            "feature engineering",
+            "predictive modeling",
+            "time series",
+        ),
+        "tools": (
+            "tableau",
+            "power bi",
+            "excel",
+            "git",
+        ),
+    },
+    "devops": {
+        "core": (
+            "git",
+            "linux",
+            "docker",
+            "ci/cd",
+            "infrastructure automation",
+        ),
+        "platforms": (
+            "kubernetes",
+            "terraform",
+            "ansible",
+            "jenkins",
+            "github actions",
+            "gitlab ci",
+        ),
+        "cloud": (
+            "aws",
+            "azure",
+            "google cloud",
+        ),
+        "observability": (
+            "prometheus",
+            "grafana",
+            "elk stack",
+            "cloudwatch",
+        ),
+        "scripting": (
+            "python",
+            "bash",
+            "powershell",
+        ),
+    },
+    "mobile": {
+        "core": (
+            "git",
+            "mobile development",
+            "rest api",
+            "unit testing",
+        ),
+        "languages": (
+            "kotlin",
+            "java",
+            "swift",
+            "dart",
+            "javascript",
+            "typescript",
+        ),
+        "frameworks": (
+            "android sdk",
+            "ios sdk",
+            "flutter",
+            "react native",
+            "swiftui",
+            "jetpack compose",
+        ),
+        "tools": (
+            "firebase",
+            "sqlite",
+            "github actions",
+            "fastlane",
+        ),
+    },
+    "unity_game": {
+        "core": (
+            "unity",
+            "c#",
+            "git",
+            "game development",
+            "object oriented programming",
+        ),
+        "gameplay": (
+            "gameplay programming",
+            "physics",
+            "animation systems",
+            "ui systems",
+            "artificial intelligence",
+        ),
+        "tools": (
+            "unity input system",
+            "shader graph",
+            "addressables",
+            "git lfs",
+            "profiling",
+            "mobile optimization",
+        ),
+        "additional": (
+            "multiplayer networking",
+            "procedural generation",
+            "scriptable objects",
+            "cinemachine",
+        ),
+    },
+}
+
+
+ROLE_SUMMARY_TEMPLATES: Final[
+    dict[str, tuple[str, ...]]
+] = {
+    "backend": (
+        "Join a product engineering team building reliable backend services and APIs used by modern web and mobile applications.",
+        "Work on scalable server-side applications, data access layers, and integrations for a growing software platform.",
+        "Help design and maintain backend systems that emphasize clean architecture, maintainability, testing, and performance.",
+    ),
+    "frontend": (
+        "Build accessible and responsive user interfaces for web products used across desktop and mobile devices.",
+        "Work with designers and backend engineers to transform product requirements into polished web experiences.",
+        "Develop maintainable frontend applications with modern component-based frameworks and automated testing.",
+    ),
+    "full_stack": (
+        "Contribute across the web stack by building user-facing interfaces, APIs, integrations, and data-driven features.",
+        "Work on end-to-end product features spanning frontend applications, backend services, and relational data models.",
+        "Join a cross-functional team delivering complete software features from interface design to production deployment.",
+    ),
+    "machine_learning": (
+        "Develop, evaluate, and integrate machine learning models for practical product and automation use cases.",
+        "Work with structured and unstructured datasets to build reproducible machine learning pipelines and services.",
+        "Help translate data-driven research into tested machine learning systems that can be deployed and monitored.",
+    ),
+    "ai_engineering": (
+        "Build AI-powered applications using language models, retrieval systems, APIs, and modern machine learning tooling.",
+        "Develop production-oriented generative AI features with emphasis on evaluation, reliability, and responsible usage.",
+        "Create intelligent software workflows that combine large language models with search, structured data, and backend services.",
+    ),
+    "data_engineering": (
+        "Build reliable data pipelines and platforms that make trusted data available for analytics and machine learning teams.",
+        "Develop ingestion, transformation, and orchestration workflows for large and diverse datasets.",
+        "Work on scalable data infrastructure with strong attention to observability, quality, and maintainability.",
+    ),
+    "data_science": (
+        "Analyze product and business data to generate insights, build predictive models, and support data-informed decisions.",
+        "Work with stakeholders to define analytical questions and develop reproducible data science solutions.",
+        "Apply statistics, experimentation, and machine learning to solve measurable business and product problems.",
+    ),
+    "devops": (
+        "Improve software delivery by automating infrastructure, deployment pipelines, monitoring, and operational workflows.",
+        "Work with engineering teams to build reliable cloud infrastructure and repeatable deployment processes.",
+        "Support scalable software systems through infrastructure-as-code, observability, and continuous delivery practices.",
+    ),
+    "mobile": (
+        "Build reliable and user-friendly mobile applications that integrate with backend services and platform capabilities.",
+        "Develop mobile product features with attention to performance, testing, maintainability, and user experience.",
+        "Work with product and design teams to deliver native or cross-platform mobile experiences.",
+    ),
+    "unity_game": (
+        "Develop interactive gameplay systems and polished features for Unity-based game and simulation projects.",
+        "Work with designers and artists to implement responsive gameplay, interfaces, animation, and performance improvements.",
+        "Build maintainable Unity systems for mobile, desktop, or simulation-focused applications.",
+    ),
+}
