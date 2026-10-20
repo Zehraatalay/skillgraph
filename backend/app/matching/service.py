@@ -4,6 +4,8 @@ import json
 from pathlib import Path
 
 from app.github.service import analyze_repository
+from app.jobs.skill_registry import normalize_skill, normalize_skill_text
+from app.repositories.graph_repository import GraphRepository
 
 
 DATASET_PATH = (
@@ -34,11 +36,19 @@ def _load_jobs() -> list[dict]:
     return data
 
 
+def _canonical(value: str) -> str:
+    return normalize_skill(value) or normalize_skill_text(value)
+
+
+def _normalize_skills(values) -> set[str]:
+    return {_canonical(v) for v in values if isinstance(v, str) and v.strip()}
+
+
 def _skill_names(
     skills: list[dict],
 ) -> set[str]:
     return {
-        skill["name"].strip().lower()
+        _canonical(skill["name"])
         for skill in skills
         if isinstance(skill, dict)
         and isinstance(skill.get("name"), str)
@@ -125,9 +135,7 @@ async def match_repository_to_jobs(
         )
     )
 
-    detected_skills = set(
-        repository_analysis["skills"]
-    )
+    detected_skills = _normalize_skills(repository_analysis["skills"])
 
     jobs = _load_jobs()
 
@@ -167,6 +175,39 @@ async def match_repository_to_jobs(
         "detected_skill_count": len(
             detected_skills
         ),
+        "total_jobs_evaluated": len(jobs),
+        "matches": matches[:limit],
+    }
+
+def match_developer_to_jobs(username: str, limit: int) -> dict | None:
+    """Rank curated job templates against technologies persisted in Neo4j.
+
+    No new GitHub API call is made; analyze the developer first via the
+    existing analysis endpoint. The score is a skill-coverage heuristic.
+    """
+    graph = GraphRepository()
+    try:
+        if not graph.developer_exists(username):
+            return None
+        stats = graph.get_developer_technology_statistics(username)
+    finally:
+        graph.close()
+
+    skills = _normalize_skills([row["technology"] for row in stats])
+    jobs = _load_jobs()
+    matches = [_calculate_match(skills, job) for job in jobs]
+    matches.sort(
+        key=lambda match: (
+            -match["score"],
+            -len(match["matched_required_skills"]),
+            -len(match["matched_preferred_skills"]),
+            match["job_id"],
+        )
+    )
+    return {
+        "username": username,
+        "detected_skills": sorted(skills),
+        "detected_skill_count": len(skills),
         "total_jobs_evaluated": len(jobs),
         "matches": matches[:limit],
     }
