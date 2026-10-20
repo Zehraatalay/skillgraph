@@ -5,6 +5,7 @@ from typing import Literal
 from pydantic import BaseModel, Field
 from app.ai.schemas import RepositoryContext
 from app.ai.llm_client import LocalLLMClient
+from app.ai.skill_quality import normalize_skill, category_for, assess_evidence
 
 
 class ProposedSkill(BaseModel):
@@ -25,6 +26,9 @@ class VerifiedSkill(BaseModel):
     explanation: str
     evidence_type: Literal['dependency', 'import', 'documentation', 'code_reference'] = 'code_reference'
     verification: Literal['quote_verified_only'] = 'quote_verified_only'
+    category: str = 'other'
+    confidence: Literal['verified_usage', 'supported', 'uncertain'] = 'uncertain'
+    confidence_reason: str = ''
 
 
 class AIAnalysis(BaseModel):
@@ -122,12 +126,14 @@ def analyze_repository(context: RepositoryContext, client: LocalLLMClient | None
             continue
         result.files_analyzed.append(source.path)
         for skill in assessment.skills:
-            name, quote = skill.name.strip(), skill.quote.strip()
+            name, quote = normalize_skill(skill.name), skill.quote.strip()
             key = (name.casefold(), source.path)
             if not name or len(quote) < 8 or quote not in excerpt or '[REDACTED]' in quote or key in seen:
                 result.rejected_evidence += 1
                 continue
             seen.add(key)
-            result.skills.append(VerifiedSkill(name=name, file=source.path, quote=quote[:200], explanation=skill.explanation[:350], evidence_type=classify_evidence(source.path, quote)))
-    result.notes.append('Quotes are substring-verified only. Algorithm implementations and technical claims remain unverified until code-level review.')
+            evidence_type = classify_evidence(source.path, quote)
+            confidence, reason = assess_evidence(name, quote, evidence_type)
+            result.skills.append(VerifiedSkill(name=name, file=source.path, quote=quote[:200], explanation=skill.explanation[:350], evidence_type=evidence_type, category=category_for(name), confidence=confidence, confidence_reason=reason))
+    result.notes.append('Confidence is rule-based and conservative, not semantic proof. verified_usage means only a dependency or import declaration was verified.')
     return result
