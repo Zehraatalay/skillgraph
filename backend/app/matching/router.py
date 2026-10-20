@@ -76,3 +76,8 @@ def match_developer(request: DeveloperMatchRequest) -> DeveloperMatchResponse:
             detail="Developer not found in Neo4j. Analyze the GitHub profile first.",
         )
     return DeveloperMatchResponse(**result)
+
+
+from app.matching.evidence_router import router as evidence_router
+
+router.include_router(evidence_router)
