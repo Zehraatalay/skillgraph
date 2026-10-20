@@ -118,5 +118,33 @@ class GitHubRepository:
             for language, byte_count in result.items()
         }
 
+    def get_repository_text_file(
+        self, owner: str, repository_name: str, path: str
+    ) -> str | None:
+        """Read small public text files; missing files are not errors."""
+        from urllib.parse import quote
+        endpoint = f"/repos/{quote(owner, safe='')}/{quote(repository_name, safe='')}/contents/{quote(path, safe='/')}"
+        response = self._session.get(
+            f"{self._base_url}{endpoint}",
+            headers={"Accept": "application/vnd.github.raw+json"},
+            timeout=20,
+        )
+        if response.status_code == 404:
+            return None
+        if response.status_code != 200:
+            return None  # Optional enrichment must not block core analysis.
+        if len(response.content) > 250_000:
+            return None
+        # Some API versions may return a JSON content wrapper.
+        if response.text.lstrip().startswith("{"):
+            try:
+                import base64
+                obj = response.json()
+                if isinstance(obj, dict) and obj.get("encoding") == "base64":
+                    return base64.b64decode(obj["content"]).decode("utf-8", errors="replace")
+            except (ValueError, KeyError, TypeError):
+                pass
+        return response.text
+
     def close(self) -> None:
         self._session.close()

@@ -2,6 +2,7 @@ from typing import Any
 
 from app.repositories.github_repository import GitHubRepository
 from app.repositories.graph_repository import GraphRepository
+from app.services.skill_extraction import extract_dependencies
 
 
 class AnalysisService:
@@ -50,6 +51,22 @@ class AnalysisService:
                     technology_name=language_name,
                     byte_count=byte_count,
                 )
+
+            # Optional dependency evidence; do not mistake a package for expertise.
+            for filename in ("requirements.txt", "pyproject.toml", "package.json"):
+                content = self._github.get_repository_text_file(
+                    owner=user["login"],
+                    repository_name=repository["name"],
+                    path=filename,
+                )
+                if not content:
+                    continue
+                for skill in sorted(extract_dependencies(filename, content)):
+                    self._graph.save_technology(
+                        repository_id=repository["id"],
+                        technology_name=skill,
+                        byte_count=0,
+                    )
 
             for topic_name in repository.get("topics", []):
                 normalized_topic = topic_name.strip().lower()
