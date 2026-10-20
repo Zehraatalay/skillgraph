@@ -6,6 +6,7 @@ from pydantic import BaseModel, Field
 from app.ai.schemas import RepositoryContext
 from app.ai.llm_client import LocalLLMClient
 from app.ai.skill_quality import normalize_skill, category_for, assess_evidence
+from app.ai.decision_engine import decide_skill
 
 
 class ProposedSkill(BaseModel):
@@ -29,6 +30,9 @@ class VerifiedSkill(BaseModel):
     category: str = 'other'
     confidence: Literal['verified_usage', 'supported', 'uncertain'] = 'uncertain'
     confidence_reason: str = ''
+    decision: Literal['accept', 'reject', 'needs_review'] = 'needs_review'
+    decision_reason: str = ''
+    review_quote: str = ''
 
 
 class AIAnalysis(BaseModel):
@@ -100,7 +104,7 @@ def redact(text: str) -> str:
     return SECRET_LINE.sub('[REDACTED]', text)
 
 
-def analyze_repository(context: RepositoryContext, client: LocalLLMClient | None = None, *, max_files: int = 6, chars_per_file: int = 2800) -> AIAnalysis:
+def analyze_repository(context: RepositoryContext, client: LocalLLMClient | None = None, *, max_files: int = 6, chars_per_file: int = 2800, semantic_review: bool = False) -> AIAnalysis:
     client = client or LocalLLMClient()
     result = AIAnalysis(repository=f'{context.owner}/{context.repository}', model=client.model, files_analyzed=[], skills=[])
     seen: set[tuple[str, str]] = set()
@@ -134,6 +138,15 @@ def analyze_repository(context: RepositoryContext, client: LocalLLMClient | None
             seen.add(key)
             evidence_type = classify_evidence(source.path, quote)
             confidence, reason = assess_evidence(name, quote, evidence_type)
-            result.skills.append(VerifiedSkill(name=name, file=source.path, quote=quote[:200], explanation=skill.explanation[:350], evidence_type=evidence_type, category=category_for(name), confidence=confidence, confidence_reason=reason))
-    result.notes.append('Confidence is rule-based and conservative, not semantic proof. verified_usage means only a dependency or import declaration was verified.')
+            decision, decision_reason = decide_skill(name, quote, evidence_type, confidence)
+            result.skills.append(VerifiedSkill(name=name, file=source.path, quote=quote[:200], explanation=skill.explanation[:350], evidence_type=evidence_type, category=category_for(name), confidence=confidence, confidence_reason=reason, decision=decision, decision_reason=decision_reason))
+    from app.ai.semantic_review import review_skill
+    sources = {f.path: f.content for f in context.files}
+    for skill in result.skills:
+        # Contextual check runs even without the optional LLM reviewer.
+        decision, reason, quote = review_skill(
+            skill, sources.get(skill.file, ''), client=client, use_llm=semantic_review
+        )
+        skill.decision, skill.decision_reason, skill.review_quote = decision, reason, quote
+    result.notes.append('Contextual checks are conservative; optional LLM review is advisory, not proof of proficiency. No graph writes occur here.')
     return result

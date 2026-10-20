@@ -14,13 +14,14 @@ def main():
     parser.add_argument('--model', default='llama3:latest')
     parser.add_argument('--max-files', type=int, default=6)
     parser.add_argument('--output', default='ai-analysis.json')
+    parser.add_argument('--semantic-review', action='store_true', help='Run advisory LLM review on uncertain code claims')
     args = parser.parse_args()
     github = GitHubRepository()
     try:
         context = RepositoryScanner(github).scan(args.owner, args.repo)
     finally:
         github.close()
-    result = analyze_repository(context, LocalLLMClient(model=args.model), max_files=args.max_files)
+    result = analyze_repository(context, LocalLLMClient(model=args.model), max_files=args.max_files, semantic_review=args.semantic_review)
     output = Path(args.output)
     output.write_text(result.model_dump_json(indent=2), encoding='utf-8')
     print(f'Analyzed {len(result.files_analyzed)} files; {len(result.skills)} verified quotes; {result.rejected_evidence} rejected. Output: {output}')
