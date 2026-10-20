@@ -146,5 +146,17 @@ class GitHubRepository:
                 pass
         return response.text
 
+    def get_repository_tree(self, owner: str, repository_name: str) -> list[dict[str, Any]]:
+        """List tracked paths from the repository default branch."""
+        from urllib.parse import quote
+        owner_q = quote(owner, safe="")
+        repo_q = quote(repository_name, safe="")
+        metadata = self._get(f"/repos/{owner_q}/{repo_q}")
+        branch = quote(metadata["default_branch"], safe="")
+        result = self._get(f"/repos/{owner_q}/{repo_q}/git/trees/{branch}", params={"recursive": "1"})
+        if result.get("truncated"):
+            raise GitHubAPIError("GitHub truncated repository tree; refusing incomplete scan.")
+        return result.get("tree", [])
+
     def close(self) -> None:
         self._session.close()

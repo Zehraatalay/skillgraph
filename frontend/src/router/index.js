@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 
 import RepositoryMatchingView from "../views/RepositoryMatchingView.vue";
+import DeveloperMatchingView from "../views/DeveloperMatchingView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -16,6 +17,11 @@ const router = createRouter({
       path: "/repository-matching",
       name: "repository-matching",
       component: RepositoryMatchingView,
+    },
+    {
+      path: "/developer-matching",
+      name: "developer-matching",
+      component: DeveloperMatchingView,
     },
   ],
 })

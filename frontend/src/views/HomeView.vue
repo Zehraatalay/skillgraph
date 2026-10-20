@@ -113,6 +113,10 @@ onMounted(checkHealth)
       </a>
 
       <div class="nav-actions">
+        <RouterLink class="repository-link-button" to="/developer-matching">
+          Developer Matching
+        </RouterLink>
+
         <RouterLink
           class="repository-link-button"
           to="/repository-matching"

@@ -8,7 +8,7 @@ from app.core.config import get_settings
 from app.api.routes.analysis import router as analysis_router
 
 from app.api.routes.skill import router as skill_router
-
+from app.api.routes.github import router as github_preview_router
 from app.api.routes.recommendation import (
     router as recommendation_router,
 )
@@ -19,8 +19,7 @@ from app.api.routes.similarity import (
     router as similarity_router,
 )
 
-from app.github.router import router as github_router
-
+from app.api.routes.github import router as github_router
 from app.matching.router import (
     router as matching_router,
 )
@@ -46,7 +45,7 @@ app.add_middleware(
 )
 
 app.include_router(health_router, prefix="/api")
-app.include_router(github_router, prefix="/api")
+app.include_router(github_router)
 app.include_router(analysis_router, prefix="/api")
 app.include_router(skill_router, prefix="/api")
 app.include_router(recommendation_router, prefix="/api")
@@ -56,3 +55,4 @@ app.include_router(
     matching_router,
     prefix="/api",
 )
+app.include_router(github_preview_router, prefix="/api")

@@ -76,3 +76,12 @@ export function getSimilarDevelopers(username, limit = 5) {
 
   return request(`/similarity/developers/${encodeURIComponent(username)}?${query}`)
 }
+
+// Matches a developer already analyzed and stored in Neo4j.
+export function matchDeveloper(username, limit = 10) {
+  return request('/matching/developer', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, limit }),
+  })
+}
