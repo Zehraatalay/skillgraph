@@ -23,6 +23,7 @@ from app.api.routes.github import router as github_router
 from app.matching.router import (
     router as matching_router,
 )
+from app.matching.evidence_router import router as evidence_matching_router
 
 settings = get_settings()
 
@@ -56,3 +57,17 @@ app.include_router(
     prefix="/api",
 )
 app.include_router(github_preview_router, prefix="/api")
+# V10 evidence-backed matching; separate from legacy developer matching.
+app.include_router(evidence_matching_router, prefix="/api/matching", tags=["Evidence Matching"])
+
+# V10.2 public profile discovery
+from app.api.routes.profile_discovery_v102 import router as profile_discovery_router
+app.include_router(profile_discovery_router)
+
+# V10.3 private ZIP upload: localhost-only until authenticated user isolation exists.
+from app.api.routes.private_zip_v103 import router as private_zip_router
+app.include_router(private_zip_router)
+
+# V10.4 ephemeral public + private profile (localhost only).
+from app.api.routes.unified_profile_v104 import router as unified_profile_router
+app.include_router(unified_profile_router)
