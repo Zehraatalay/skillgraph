@@ -23,11 +23,7 @@ def make_initial_state():
 def test_sqlite_checkpoint_survives_reconnection(tmp_path):
     db_path = tmp_path / "checkpoints.sqlite"
 
-    config = {
-        "configurable": {
-            "thread_id": "persistent-analysis-001"
-        }
-    }
+    config = {"configurable": {"thread_id": "persistent-analysis-001"}}
 
     # First connection: execute workflow and save checkpoint.
     with create_sqlite_checkpointer(db_path) as checkpointer:

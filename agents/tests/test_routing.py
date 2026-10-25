@@ -1,7 +1,11 @@
 import pytest
 
-from agents.graph.workflow import build_workflow
 from agents.graph.checkpointer import create_checkpointer
+from agents.graph.workflow import build_workflow
+from agents.schemas.github import (
+    GitHubAnalysis,
+    RepositoryAnalysis,
+)
 from agents.schemas.job import JobPosting
 
 
@@ -30,7 +34,10 @@ def test_candidate_source_routing(
     github_username,
     expected_nodes,
 ):
-    graph = build_workflow(create_checkpointer())
+    graph = build_workflow(
+        checkpointer=create_checkpointer(),
+        github_analyzer=FakeGitHubAnalyzer(),
+    )
 
     initial_state = {
         "cv_text": cv_text,
@@ -50,20 +57,12 @@ def test_candidate_source_routing(
     events = list(
         graph.stream(
             initial_state,
-            config={
-                "configurable": {
-                    "thread_id": "routing-test"
-                }
-            },
+            config={"configurable": {"thread_id": "routing-test"}},
             stream_mode="updates",
         )
     )
 
-    executed_nodes = {
-        node_name
-        for event in events
-        for node_name in event
-    }
+    executed_nodes = {node_name for event in events for node_name in event}
 
     assert expected_nodes.issubset(executed_nodes)
 
@@ -74,3 +73,18 @@ def test_candidate_source_routing(
         assert "analyze_github" not in executed_nodes
 
     assert "build_candidate_profile" in executed_nodes
+
+
+class FakeGitHubAnalyzer:
+    def analyze(self, username: str) -> GitHubAnalysis:
+        return GitHubAnalysis(
+            username=username,
+            repositories=[
+                RepositoryAnalysis(
+                    repository_name="example-project",
+                    repository_url=("https://github.com/exampleuser/example-project"),
+                    skills=[],
+                    analyzed_files=["src/main.py"],
+                )
+            ],
+        )

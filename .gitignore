@@ -33,3 +33,7 @@ frontend/.vite/
 *.log
 npm-debug.log*
 
+
+.cache/
+# Local development scripts
+/scripts/

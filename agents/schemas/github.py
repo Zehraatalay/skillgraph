@@ -15,6 +15,4 @@ class RepositoryAnalysis(BaseModel):
 class GitHubAnalysis(BaseModel):
     username: str = Field(min_length=1)
 
-    repositories: list[RepositoryAnalysis] = Field(
-        default_factory=list
-    )
+    repositories: list[RepositoryAnalysis] = Field(default_factory=list)

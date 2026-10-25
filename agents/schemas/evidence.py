@@ -1,6 +1,6 @@
 from enum import Enum
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 
 class EvidenceSource(str, Enum):
@@ -15,9 +15,9 @@ class EvidenceType(str, Enum):
 
 
 class SkillEvidence(BaseModel):
-    skill: str = Field(min_length=1)
+    skill: str
     source: EvidenceSource
     evidence_type: EvidenceType
-
     description: str | None = None
     reference: str | None = None
+    code_snippet: str | None = None

@@ -23,11 +23,7 @@ def make_initial_state(cv_text: str):
 def test_checkpoint_state():
     graph = build_workflow(create_checkpointer())
 
-    config = {
-        "configurable": {
-            "thread_id": "analysis-001"
-        }
-    }
+    config = {"configurable": {"thread_id": "analysis-001"}}
 
     graph.invoke(
         make_initial_state("Python developer"),
@@ -43,17 +39,9 @@ def test_checkpoint_state():
 def test_thread_isolation():
     graph = build_workflow(create_checkpointer())
 
-    config_1 = {
-        "configurable": {
-            "thread_id": "analysis-001"
-        }
-    }
+    config_1 = {"configurable": {"thread_id": "analysis-001"}}
 
-    config_2 = {
-        "configurable": {
-            "thread_id": "analysis-002"
-        }
-    }
+    config_2 = {"configurable": {"thread_id": "analysis-002"}}
 
     graph.invoke(
         make_initial_state("Python developer"),
@@ -75,11 +63,7 @@ def test_thread_isolation():
 def test_checkpoint_history():
     graph = build_workflow(create_checkpointer())
 
-    config = {
-        "configurable": {
-            "thread_id": "analysis-history"
-        }
-    }
+    config = {"configurable": {"thread_id": "analysis-history"}}
 
     graph.invoke(
         make_initial_state("Python developer"),

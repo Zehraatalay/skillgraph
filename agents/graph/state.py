@@ -1,23 +1,18 @@
+
+
 from typing import TypedDict
 
-from agents.schemas.candidate import CandidateProfile
-from agents.schemas.cv import CVAnalysis
-from agents.schemas.github import GitHubAnalysis
-from agents.schemas.job import JobPosting
 
-
-class SkillGraphState(TypedDict):
-    # User inputs
+class SkillGraphState(TypedDict, total=False):
     cv_text: str | None
     github_username: str | None
     preferences_text: str | None
 
-    job_postings: list[JobPosting]
+    job_postings: list[dict]
 
-    # Intermediate analysis
-    cv_analysis: CVAnalysis | None
-    github_analysis: GitHubAnalysis | None
-    candidate_profile: CandidateProfile | None
+    cv_analysis: dict | None
+    github_analysis: dict | None
+    candidate_profile: dict | None
 
-    # Final output
+    job_analyses: list[dict]
     results: list[dict]

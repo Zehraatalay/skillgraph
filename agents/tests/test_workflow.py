@@ -6,11 +6,7 @@ from agents.schemas.job import JobPosting
 def test_workflow_streaming():
     graph = build_workflow(create_checkpointer())
 
-    config = {
-        "configurable": {
-            "thread_id": "test-session-001"
-        }
-    }
+    config = {"configurable": {"thread_id": "test-session-001"}}
 
     initial_state = {
         "cv_text": "Python developer with ML experience",
@@ -21,7 +17,7 @@ def test_workflow_streaming():
                 id="job-001",
                 title="ML Engineer",
                 description="Python and machine learning",
-            )
+            ).model_dump(mode="json")
         ],
         "candidate_profile": None,
         "results": [],
@@ -35,11 +31,7 @@ def test_workflow_streaming():
         )
     )
 
-    executed_nodes = [
-        node_name
-        for event in events
-        for node_name in event
-    ]
+    executed_nodes = [node_name for event in events for node_name in event]
 
     assert executed_nodes == [
         "validate_input",
@@ -50,10 +42,9 @@ def test_workflow_streaming():
 
     final_state = graph.get_state(config)
 
-    from agents.schemas.cv import CVAnalysis
-
     assert isinstance(
         final_state.values["cv_analysis"],
-        CVAnalysis,
+        dict,
     )
+
     assert final_state.next == ()
