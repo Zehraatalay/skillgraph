@@ -1,0 +1,38 @@
+[
+  {"candidate_skill": "Python", "required_skill": "Python", "expected_match": true, "category": "exact"},
+  {"candidate_skill": "NumPy", "required_skill": "NumPy", "expected_match": true, "category": "exact"},
+  {"candidate_skill": "PyTorch", "required_skill": "PyTorch", "expected_match": true, "category": "exact"},
+  {"candidate_skill": "SQL", "required_skill": "SQL", "expected_match": true, "category": "exact"},
+  {"candidate_skill": "Docker", "required_skill": "Docker", "expected_match": true, "category": "exact"},
+  {"candidate_skill": "FastAPI", "required_skill": "FastAPI", "expected_match": true, "category": "exact"},
+
+  {"candidate_skill": "sklearn", "required_skill": "scikit-learn", "expected_match": true, "category": "alias"},
+  {"candidate_skill": "scikit learn", "required_skill": "scikit-learn", "expected_match": true, "category": "alias"},
+  {"candidate_skill": "oop", "required_skill": "Object-Oriented Programming", "expected_match": true, "category": "alias"},
+  {"candidate_skill": "retrieval-augmented generation", "required_skill": "RAG", "expected_match": true, "category": "alias"},
+
+  {"candidate_skill": "Python Dataclasses", "required_skill": "Python", "expected_match": true, "category": "hierarchical"},
+  {"candidate_skill": "Python Type Hinting", "required_skill": "Python", "expected_match": true, "category": "hierarchical"},
+  {"candidate_skill": "NumPy Boolean Indexing", "required_skill": "NumPy", "expected_match": true, "category": "hierarchical"},
+  {"candidate_skill": "NumPy Array Manipulation", "required_skill": "NumPy", "expected_match": true, "category": "hierarchical"},
+  {"candidate_skill": "Gymnasium Environment Design", "required_skill": "Gymnasium", "expected_match": true, "category": "hierarchical"},
+
+  {"candidate_skill": "Python", "required_skill": "Python Dataclasses", "expected_match": false, "category": "directional_negative"},
+  {"candidate_skill": "NumPy", "required_skill": "NumPy Boolean Indexing", "expected_match": false, "category": "directional_negative"},
+  {"candidate_skill": "Gymnasium", "required_skill": "Gymnasium Environment API", "expected_match": false, "category": "directional_negative"},
+
+  {"candidate_skill": "PyTorch", "required_skill": "TensorFlow", "expected_match": false, "category": "unrelated"},
+  {"candidate_skill": "Pandas", "required_skill": "NumPy", "expected_match": false, "category": "unrelated"},
+  {"candidate_skill": "Flask", "required_skill": "FastAPI", "expected_match": false, "category": "unrelated"},
+  {"candidate_skill": "Git", "required_skill": "Docker", "expected_match": false, "category": "unrelated"},
+  {"candidate_skill": "PostgreSQL", "required_skill": "MongoDB", "expected_match": false, "category": "unrelated"},
+
+  {"candidate_skill": "PyTorch Neural Network Training", "required_skill": "PyTorch", "expected_match": true, "category": "related_unsupported"},
+  {"candidate_skill": "Pandas DataFrame Manipulation", "required_skill": "Pandas", "expected_match": true, "category": "related_unsupported"},
+  {"candidate_skill": "FastAPI Endpoint Development", "required_skill": "FastAPI", "expected_match": true, "category": "related_unsupported"},
+  {"candidate_skill": "Docker Containerization", "required_skill": "Docker", "expected_match": true, "category": "related_unsupported"},
+  {"candidate_skill": "SQL Window Functions", "required_skill": "SQL", "expected_match": true, "category": "related_unsupported"},
+
+  {"candidate_skill": "Python", "required_skill": "Machine Learning", "expected_match": false, "category": "related_but_insufficient"},
+  {"candidate_skill": "RAG", "required_skill": "Machine Learning", "expected_match": false, "category": "related_but_insufficient"}
+]

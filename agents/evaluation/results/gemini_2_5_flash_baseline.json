@@ -1,0 +1,210 @@
+{
+  "golden-001": {
+    "job_id": "golden-001",
+    "requirement_groups": [
+      {
+        "skills": [
+          "Python"
+        ],
+        "operator": "all",
+        "priority": "required",
+        "evidence": "Strong programming skills in Python."
+      },
+      {
+        "skills": [
+          "NumPy",
+          "Pandas"
+        ],
+        "operator": "all",
+        "priority": "required",
+        "evidence": "Experience working with NumPy and Pandas."
+      },
+      {
+        "skills": [
+          "machine learning fundamentals"
+        ],
+        "operator": "all",
+        "priority": "required",
+        "evidence": "Understanding of machine learning fundamentals."
+      },
+      {
+        "skills": [
+          "Git"
+        ],
+        "operator": "all",
+        "priority": "required",
+        "evidence": "Experience with Git version control."
+      },
+      {
+        "skills": [
+          "PyTorch",
+          "TensorFlow"
+        ],
+        "operator": "any",
+        "priority": "preferred",
+        "evidence": "Familiarity with PyTorch or TensorFlow."
+      },
+      {
+        "skills": [
+          "FastAPI"
+        ],
+        "operator": "all",
+        "priority": "preferred",
+        "evidence": "Experience building REST APIs using FastAPI."
+      },
+      {
+        "skills": [
+          "Docker",
+          "containerization"
+        ],
+        "operator": "all",
+        "priority": "preferred",
+        "evidence": "Knowledge of Docker and containerization."
+      }
+    ]
+  },
+  "golden-002": {
+    "job_id": "golden-002",
+    "requirement_groups": [
+      {
+        "skills": [
+          "SQL"
+        ],
+        "operator": "all",
+        "priority": "required",
+        "evidence": "Proficiency in SQL."
+      },
+      {
+        "skills": [
+          "Excel"
+        ],
+        "operator": "all",
+        "priority": "required",
+        "evidence": "Strong Excel skills."
+      },
+      {
+        "skills": [
+          "Power BI",
+          "Tableau"
+        ],
+        "operator": "any",
+        "priority": "required",
+        "evidence": "Experience with Power BI or Tableau."
+      },
+      {
+        "skills": [
+          "Python"
+        ],
+        "operator": "all",
+        "priority": "preferred",
+        "evidence": "Familiarity with Python."
+      },
+      {
+        "skills": [
+          "statistical analysis"
+        ],
+        "operator": "all",
+        "priority": "preferred",
+        "evidence": "Knowledge of statistical analysis."
+      }
+    ]
+  },
+  "golden-003": {
+    "job_id": "golden-003",
+    "requirement_groups": [
+      {
+        "skills": [
+          "large language models"
+        ],
+        "operator": "all",
+        "priority": "required",
+        "evidence": "Experience developing applications with large language models."
+      },
+      {
+        "skills": [
+          "retrieval-augmented generation (RAG)"
+        ],
+        "operator": "all",
+        "priority": "required",
+        "evidence": "Knowledge of retrieval-augmented generation (RAG)."
+      },
+      {
+        "skills": [
+          "FAISS",
+          "Chroma"
+        ],
+        "operator": "any",
+        "priority": "required",
+        "evidence": "Experience with vector databases such as FAISS or Chroma."
+      },
+      {
+        "skills": [
+          "Python"
+        ],
+        "operator": "all",
+        "priority": "required",
+        "evidence": "Strong Python programming skills."
+      },
+      {
+        "skills": [
+          "LangChain",
+          "LlamaIndex"
+        ],
+        "operator": "any",
+        "priority": "preferred",
+        "evidence": "Familiarity with LangChain or LlamaIndex."
+      }
+    ]
+  },
+  "golden-004": {
+    "job_id": "golden-004",
+    "requirement_groups": [
+      {
+        "skills": [
+          "REST APIs",
+          "Python"
+        ],
+        "operator": "all",
+        "priority": "required",
+        "evidence": "Experience developing REST APIs with Python."
+      },
+      {
+        "skills": [
+          "PostgreSQL"
+        ],
+        "operator": "all",
+        "priority": "required",
+        "evidence": "Knowledge of PostgreSQL."
+      },
+      {
+        "skills": [
+          "Docker"
+        ],
+        "operator": "all",
+        "priority": "required",
+        "evidence": "Experience using Docker."
+      },
+      {
+        "skills": [
+          "Redis"
+        ],
+        "operator": "all",
+        "priority": "preferred",
+        "evidence": "Familiarity with Redis."
+      },
+      {
+        "skills": [
+          "AWS",
+          "Google Cloud"
+        ],
+        "operator": "any",
+        "priority": "preferred",
+        "evidence": "Experience with AWS or Google Cloud."
+      }
+    ]
+  },
+  "golden-005": {
+    "job_id": "golden-005",
+    "requirement_groups": []
+  }
+}
